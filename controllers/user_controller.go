@@ -42,3 +42,32 @@ func GetUserInfo(c *gin.Context) {
 		"email":   user.Email,
 	})
 }
+
+func GetAllUsers(c *gin.Context) {
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token não fornecido"})
+		return
+	}
+
+	token := strings.TrimPrefix(authHeader, "Bearer ")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token mal formatado"})
+		return
+	}
+
+	_, err := services.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+		return
+	}
+
+	db := config.GetDB()
+	users, err := models.GetAllUsers(db)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar usuários"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": users})
+}

@@ -16,8 +16,10 @@ func SetupRoutes(router *gin.Engine) {
 	protected := router.Group("/")
 	protected.Use(middlewares.AuthMiddleware)
 
-	protected.GET("/forecast", controllers.GetForecast)
-	protected.GET("/consumption", controllers.GetConsumption)
+	protected.GET("/forecast/:userID", controllers.GetForecast)
+	//testada
+	protected.GET("/consumption/:userID", controllers.GetConsumption)
+	protected.GET("/users", controllers.GetAllUsers)
 	protected.POST("/consumption", controllers.AddConsumption)
 	protected.GET("/user", controllers.GetUserInfo)
 }
