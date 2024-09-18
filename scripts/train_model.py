@@ -3,13 +3,31 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import joblib
-import os
+import psycopg2
+from sqlalchemy import create_engine
 
-def load_data(file_path="data/consumption_data.csv"):
-    if os.path.exists(file_path):
-        data = pd.read_csv(file_path)
-    else:
-        raise FileNotFoundError("Arquivo de dados não encontrado")
+
+DB_HOST = 'localhost'
+DB_PORT = '5432'
+DB_USER = 'postgres'
+DB_PASSWORD = 'password'
+DB_NAME = 'ener_predict'
+
+def load_data():
+    connection_string = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    engine = create_engine(connection_string)
+    
+    query = """
+    SELECT
+        EXTRACT(MONTH FROM consumption_date) AS month,
+        EXTRACT(DAY FROM consumption_date) AS day,
+        temperature,
+        usage_hours,
+        amount AS energy_consumption
+    FROM consumptions
+    """
+    
+    data = pd.read_sql(query, engine)
     return data
 
 def train_model(data):
@@ -33,7 +51,5 @@ def save_model(model, model_path="models/energy_forecast_model.pkl"):
 
 if __name__ == "__main__":
     data = load_data()
-
     model = train_model(data)
-
     save_model(model)
