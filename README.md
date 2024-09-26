@@ -19,7 +19,6 @@ EnerPredict é uma aplicação projetada para prever o consumo de energia com ba
 
 Configure as variáveis de ambiente no seu arquivo .env:
 
-Copiar código
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
